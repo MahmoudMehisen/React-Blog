@@ -1,39 +1,29 @@
-import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import React, { useEffect, useState } from 'react';
+import './App.css';
+import Posts from './components/Posts';
+import PostLoadingComponent from './components/PostLoading';
 
-const sections = [
-  { title: 'Technology', url: '#' },
-  { title: 'Design', url: '#' },
-  { title: 'Culture', url: '#' },
-  { title: 'Business', url: '#' },
-  { title: 'Politics', url: '#' },
-  { title: 'Opinion', url: '#' },
-  { title: 'Science', url: '#' },
-  { title: 'Health', url: '#' },
-  { title: 'Style', url: '#' },
-  { title: 'Travel', url: '#' },
-];
+function App() {
+	const PostLoading = PostLoadingComponent(Posts);
+	const [appState, setAppState] = useState({
+		loading: false,
+		posts: null,
+	});
 
-
-
-const theme = createTheme();
-
-export default function App() {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="lg">
-        <Header title="Blog" sections={sections} />
-        
-      </Container>
-      <Footer
-        title="Footer"
-        description="Something here to give the footer a purpose!"
-      />
-    </ThemeProvider>
-  );
+	useEffect(() => {
+		setAppState({ loading: true });
+		const apiUrl = `http://127.0.0.1:8000/api/`;
+		fetch(apiUrl)
+			.then((data) => data.json())
+			.then((posts) => {
+				setAppState({ loading: false, posts: posts });
+			});
+	}, [setAppState]);
+	return (
+		<div className="App">
+			<h1>Latest Posts</h1>
+			<PostLoading isLoading={appState.loading} posts={appState.posts} />
+		</div>
+	);
 }
+export default App;
